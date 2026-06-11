@@ -1,0 +1,141 @@
+---
+import Page from '../../layouts/Page.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { getCollection } from 'astro:content';
+
+const allWork = await getCollection('work');
+const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
+
+const filters = ['all', 'devtools', 'ai', 'security'] as const;
+---
+
+<Page title="Work" description="Case studies: technical writing for dev tools, AI, and security products.">
+  <section class="page-wrap work-index">
+
+    <header class="page-header">
+      <p class="section-label mono-label">Work</p>
+      <h1 class="page-heading">Case studies</h1>
+      <p class="page-sub">
+        Each project here shows context, reader, process, and outcome — not just the finished artifact. Clients hire on process.
+      </p>
+    </header>
+
+    <nav class="filter-nav" aria-label="Filter by domain">
+      <ul role="list">
+        {filters.map(f => (
+          <li>
+            <button
+              class="filter-btn mono-label"
+              data-filter={f}
+              aria-pressed={f === 'all' ? 'true' : 'false'}
+            >
+              {f === 'all' ? 'All' : f}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="work-grid" id="work-grid">
+      {sortedWork.map(entry => (
+        <div class="work-item" data-domain={entry.data.domain}>
+          <WorkCard
+            title={entry.data.title}
+            summary={entry.data.summary}
+            domain={entry.data.domain}
+            role={entry.data.role}
+            year={entry.data.year}
+            client={entry.data.client}
+            slug={entry.slug}
+          />
+        </div>
+      ))}
+    </div>
+
+  </section>
+</Page>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.work-item');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter!;
+
+      buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+
+      items.forEach(item => {
+        const match = filter === 'all' || item.dataset.domain === filter;
+        item.style.display = match ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .work-index {
+    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-bottom: var(--gap-2xl);
+  }
+
+  .page-header {
+    max-width: 640px;
+    margin-bottom: var(--gap-xl);
+  }
+
+  .section-label { margin-bottom: var(--gap-sm); }
+
+  .page-heading {
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--gap-md);
+  }
+
+  .page-sub {
+    color: var(--color-ink-2);
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+  }
+
+  /* Filter nav */
+  .filter-nav {
+    margin-bottom: var(--gap-lg);
+  }
+  .filter-nav ul {
+    display: flex;
+    gap: var(--gap-sm);
+    list-style: none;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: none;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    padding: 0.35em 0.9em;
+    cursor: pointer;
+    color: var(--color-muted);
+    transition: all var(--duration) var(--ease);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+  .filter-btn:hover,
+  .filter-btn[aria-pressed="true"] {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+    background: var(--color-surface);
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--gap-md);
+  }
+</style>

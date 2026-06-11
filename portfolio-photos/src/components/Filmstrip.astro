@@ -1,0 +1,102 @@
+---
+interface Photo {
+  src: string;
+  alt: string;
+}
+
+interface Props {
+  photos: Photo[];
+}
+
+const { photos } = Astro.props;
+// Duplicate enough times for seamless loop (need at least 2× the set)
+const strip = [...photos, ...photos, ...photos];
+---
+
+<section class="filmstrip-section" aria-label="Photo reel">
+  <div class="filmstrip-track" aria-hidden="true">
+    {strip.map((p, i) => (
+      <div class="filmstrip-frame">
+        <img
+          src={p.src}
+          alt={p.alt}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .filmstrip-section {
+    overflow: hidden;
+    position: relative;
+    padding-block: 0;
+    /* scanline overlay — very subtle, bridges film+terminal */
+    background: var(--void);
+  }
+  .filmstrip-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(20, 20, 20, 0.06) 3px,
+      rgba(20, 20, 20, 0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .filmstrip-track {
+    display: flex;
+    gap: 3px;
+    width: max-content;
+    animation: scroll-left 40s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filmstrip-track { animation: none; }
+  }
+
+  .filmstrip-section:hover .filmstrip-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll-left {
+    from { transform: translateX(0); }
+    /* Move exactly one "set" (1/3 of the strip) for seamless loop */
+    to   { transform: translateX(calc(-100% / 3)); }
+  }
+
+  .filmstrip-frame {
+    width: 280px;
+    height: 190px;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .filmstrip-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.9) contrast(1.02);
+    transition: filter 300ms ease;
+  }
+
+  .filmstrip-section:hover .filmstrip-frame img {
+    filter: brightness(1) contrast(1);
+  }
+
+  @media (max-width: 640px) {
+    .filmstrip-frame {
+      width: 200px;
+      height: 135px;
+    }
+  }
+</style>

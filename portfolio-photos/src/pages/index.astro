@@ -1,0 +1,446 @@
+---
+import Base from '../layouts/Base.astro';
+import Filmstrip from '../components/Filmstrip.astro';
+import { getCollection } from 'astro:content';
+
+const allPhotos = await getCollection('photos');
+const sorted = allPhotos.sort((a, b) => {
+  const oA = a.data.order ?? 999;
+  const oB = b.data.order ?? 999;
+  if (oA !== oB) return oA - oB;
+  return b.data.date.valueOf() - a.data.date.valueOf();
+});
+
+// Hero: first featured photo
+const heroPhoto = sorted.find(p => p.data.featured) ?? sorted[0];
+
+// Filmstrip: all photos
+const stripPhotos = sorted.map(p => ({ src: p.data.src, alt: p.data.alt }));
+
+// Editorial grid: non-hero photos (first 7 max)
+const gridPhotos = sorted.filter(p => p.id !== heroPhoto.id).slice(0, 7);
+
+// Collections: unique series with cover photo and count
+type SeriesEntry = { name: string; cover: string; coverAlt: string; count: number };
+const seriesMap = new Map<string, SeriesEntry>();
+for (const p of sorted) {
+  const s = p.data.series;
+  if (!s) continue;
+  if (!seriesMap.has(s)) {
+    seriesMap.set(s, { name: s, cover: p.data.src, coverAlt: p.data.alt, count: 1 });
+  } else {
+    seriesMap.get(s)!.count++;
+  }
+}
+const collections = [...seriesMap.values()];
+---
+
+<Base>
+  <!-- ─── HEADER ─── -->
+  <header class="site-header">
+    <a href="/" class="site-name" aria-label="Home — Minh Tú">MT</a>
+    <nav class="header-nav" aria-label="Site navigation">
+      <a href="#collections" class="nav-item">Collections</a>
+      <a href="https://your-domain.com" class="nav-item nav-out" target="_blank" rel="noopener noreferrer">
+        writing &amp; work ↗
+      </a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ─── 01. HERO ─── -->
+    <section class="hero" aria-label="Featured photograph">
+      <div
+        class="hero-bg"
+        style={`background-image: url(${heroPhoto.data.src})`}
+        role="img"
+        aria-label={heroPhoto.data.alt}
+      ></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-name">Minh Tú Nguyễn</p>
+        <p class="hero-sub">Photographs</p>
+      </div>
+      <a href="#reel" class="scroll-hint" aria-label="Scroll down">
+        <span class="scroll-line"></span>
+      </a>
+    </section>
+
+    <!-- ─── 02. FILMSTRIP REEL ─── -->
+    <section id="reel" aria-label="Photo reel">
+      <Filmstrip photos={stripPhotos} />
+    </section>
+
+    <!-- ─── 03. EDITORIAL GRID ─── -->
+    <section class="editorial" aria-label="Selected photographs">
+      <div class="editorial-grid">
+        {gridPhotos.map((photo, i) => {
+          return (
+            <div class={`ed-cell ed-cell--${i}`}>
+              <img
+                src={photo.data.src}
+                alt={photo.data.alt}
+                loading="lazy"
+                decoding="async"
+              />
+              {photo.data.caption && (
+                <p class="ed-caption">{photo.data.caption}</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- ─── 04. COLLECTIONS ─── -->
+    <section id="collections" class="collections-section" aria-labelledby="coll-heading">
+      <div class="coll-header">
+        <span class="coll-rule"></span>
+        <h2 id="coll-heading" class="coll-label">Collections</h2>
+      </div>
+      <ul class="coll-grid" role="list">
+        {collections.map((c, i) => (
+          <li
+            class="coll-card"
+            style={`--rotate: ${(i % 3 === 0 ? -1.2 : i % 3 === 1 ? 0.8 : -0.5)}deg`}
+          >
+            <a href={`/series/${c.name}`} class="coll-link">
+              <div class="coll-cover">
+                <img src={c.cover} alt={c.coverAlt} loading="lazy" decoding="async" />
+              </div>
+              <div class="coll-info">
+                <span class="coll-name">{c.name}</span>
+                <span class="coll-count">{c.count}</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-copy">&copy; {new Date().getFullYear()} Minh Tú Nguyễn</span>
+    <a href="https://your-domain.com" class="footer-back" target="_blank" rel="noopener noreferrer">
+      writing &amp; work ↗
+    </a>
+  </footer>
+
+</Base>
+
+<style>
+  /* ─── HEADER ─── */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: var(--pad-page);
+    /* transparent initially — JS can add bg on scroll if needed */
+  }
+
+  .site-name {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-wider);
+    color: rgba(232, 230, 226, 0.6);
+    transition: color var(--duration) var(--ease);
+  }
+  .site-name:hover { color: var(--ink); }
+
+  .header-nav {
+    display: flex;
+    gap: var(--gap-lg);
+    align-items: center;
+  }
+
+  .nav-item {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: rgba(232, 230, 226, 0.5);
+    transition: color var(--duration) var(--ease);
+  }
+  .nav-item:hover { color: var(--ink); }
+  .nav-out { color: rgba(176, 173, 168, 0.4); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scale(1.04);
+    animation: hero-drift 18s ease-in-out infinite alternate;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg { animation: none; transform: none; }
+  }
+
+  @keyframes hero-drift {
+    from { transform: scale(1.04) translate(0, 0); }
+    to   { transform: scale(1.04) translate(-1%, -0.5%); }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(14, 14, 14, 0.75) 0%,
+      rgba(14, 14, 14, 0.1) 50%,
+      transparent 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    padding: var(--pad-page);
+    padding-bottom: calc(var(--pad-page) + 3rem);
+  }
+
+  .hero-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-light);
+    letter-spacing: var(--tracking-wider);
+    color: rgba(232, 230, 226, 0.8);
+    text-transform: lowercase;
+  }
+
+  .hero-sub {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    color: rgba(176, 173, 168, 0.5);
+    margin-top: 0.25em;
+    text-transform: lowercase;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: var(--gap-md);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    opacity: 0.4;
+    transition: opacity var(--duration) var(--ease);
+    animation: scroll-fade 2.5s ease-in-out infinite;
+  }
+  .scroll-hint:hover { opacity: 0.7; }
+
+  @keyframes scroll-fade {
+    0%, 100% { opacity: 0.2; transform: translateX(-50%) translateY(0); }
+    50%       { opacity: 0.5; transform: translateX(-50%) translateY(4px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-hint { animation: none; }
+  }
+
+  .scroll-line {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: rgba(232, 230, 226, 0.6);
+  }
+
+  /* ─── EDITORIAL GRID ─── */
+  .editorial {
+    padding: 3px;
+    background: var(--void);
+  }
+
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 3px;
+  }
+
+  /* 7-photo asymmetric pattern */
+  .ed-cell--0 { grid-column: span 8; }   /* large landscape */
+  .ed-cell--1 { grid-column: span 4; }   /* small */
+  .ed-cell--2 { grid-column: span 4; }   /* small */
+  .ed-cell--3 { grid-column: span 8; }   /* large landscape (mirror) */
+  .ed-cell--4 { grid-column: span 12; }  /* full width */
+  .ed-cell--5 { grid-column: span 6; }   /* half */
+  .ed-cell--6 { grid-column: span 6; }   /* half */
+
+  .ed-cell {
+    position: relative;
+    overflow: hidden;
+    background: var(--void-2);
+    aspect-ratio: 4/3;
+  }
+
+  .ed-cell--4 { aspect-ratio: 21/9; }   /* wider for full-width row */
+  .ed-cell--1,
+  .ed-cell--2 { aspect-ratio: 3/4; }   /* portrait for small cells */
+
+  .ed-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 600ms var(--ease);
+  }
+  .ed-cell:hover img { transform: scale(1.03); }
+
+  .ed-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--gap-sm);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: rgba(232, 230, 226, 0.7);
+    background: linear-gradient(to top, rgba(14,14,14,0.7) 0%, transparent 100%);
+  }
+
+  @media (max-width: 768px) {
+    .ed-cell--0,
+    .ed-cell--3,
+    .ed-cell--4 { grid-column: span 12; }
+    .ed-cell--1,
+    .ed-cell--2 { grid-column: span 6; }
+    .ed-cell--5,
+    .ed-cell--6 { grid-column: span 12; }
+    .ed-cell--4 { aspect-ratio: 16/9; }
+  }
+
+  @media (max-width: 480px) {
+    .ed-cell--1,
+    .ed-cell--2 { grid-column: span 12; aspect-ratio: 4/3; }
+  }
+
+  /* ─── COLLECTIONS ─── */
+  .collections-section {
+    padding: var(--gap-xl) var(--pad-page) var(--gap-xl);
+  }
+
+  .coll-header {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+    margin-bottom: var(--gap-xl);
+  }
+
+  .coll-rule {
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .coll-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-light);
+    letter-spacing: var(--tracking-wider);
+    color: var(--muted);
+    text-transform: lowercase;
+  }
+
+  .coll-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-lg);
+    list-style: none;
+    padding: 0;
+  }
+
+  .coll-card {
+    transform: rotate(var(--rotate));
+    transition: transform 400ms var(--ease), box-shadow 400ms var(--ease);
+    transform-origin: center bottom;
+  }
+  .coll-card:hover {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+
+  .coll-link { display: block; text-decoration: none; }
+
+  .coll-cover {
+    width: clamp(200px, 28vw, 320px);
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--void-2);
+  }
+
+  .coll-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.88) saturate(0.95);
+    transition: filter 400ms var(--ease);
+  }
+  .coll-card:hover .coll-cover img {
+    filter: brightness(1) saturate(1);
+  }
+
+  .coll-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: var(--gap-sm) 0 var(--gap-xs);
+  }
+
+  .coll-name {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: var(--ink-2);
+    text-transform: lowercase;
+    transition: color var(--duration) var(--ease);
+  }
+  .coll-card:hover .coll-name { color: var(--ink); }
+
+  .coll-count {
+    font-size: var(--text-xs);
+    color: var(--muted);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  /* ─── FOOTER ─── */
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap-md) var(--pad-page);
+    border-top: 1px solid var(--rule);
+  }
+
+  .footer-copy {
+    font-size: var(--text-xs);
+    color: var(--muted);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .footer-back {
+    font-size: var(--text-xs);
+    color: var(--muted);
+    letter-spacing: var(--tracking-wide);
+    transition: color var(--duration) var(--ease);
+  }
+  .footer-back:hover { color: var(--ink-2); }
+</style>

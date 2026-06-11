@@ -1,0 +1,123 @@
+---
+const pathname = Astro.url.pathname;
+
+const links = [
+  { href: '/work', label: 'Work' },
+  { href: '/writing', label: 'Writing' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+---
+
+<header class="site-header">
+  <nav class="page-wrap nav-inner" aria-label="Site navigation">
+    <a href="/" class="nav-home" aria-label="Home">
+      <span class="nav-name">Minh Tú Nguyễn</span>
+      <span class="nav-role mono-label">Technical Writer</span>
+    </a>
+    <ul class="nav-links" role="list">
+      {links.map(link => (
+        <li>
+          <a
+            href={link.href}
+            class:list={['nav-link', { 'is-active': pathname.startsWith(link.href) }]}
+            aria-current={pathname.startsWith(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a href="/contact" class="nav-cta">Hire me</a>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-paper);
+    border-bottom: 1px solid var(--color-rule);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    width: 100%;
+  }
+
+  .nav-home {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--color-ink);
+    flex-shrink: 0;
+  }
+  .nav-home:hover .nav-name { color: var(--color-accent); }
+
+  .nav-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+    transition: color var(--duration) var(--ease);
+  }
+
+  .nav-role {
+    line-height: 1;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: var(--gap-md);
+    list-style: none;
+    padding: 0;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    letter-spacing: var(--tracking-wide);
+    transition: color var(--duration) var(--ease);
+    padding: 0.2em 0;
+    border-bottom: 1px solid transparent;
+  }
+  .nav-link:hover,
+  .nav-link.is-active {
+    color: var(--color-ink);
+  }
+  .nav-link.is-active {
+    border-bottom-color: var(--color-ink);
+  }
+
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-accent);
+    text-decoration: none;
+    padding: 0.4em 0.9em;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    flex-shrink: 0;
+  }
+  .nav-cta:hover {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-inner { gap: var(--gap-md); }
+  }
+</style>

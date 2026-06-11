@@ -1,0 +1,37 @@
+---
+title: "Master Data Management: A Technical Reference for Data Teams"
+summary: "A structured explainer covering MDM domains, implementation patterns, and strategic context — written to serve both the data architect and the procurement director reading the same page."
+domain: "devtools"
+role: "Technical writer, ghostwriter"
+year: 2026
+client: "Alexander Thamm GmbH"
+problem: "MDM is a discipline most organizations know they need but can't explain with precision. The client needed a piece that could work for two audiences simultaneously: a data architect evaluating implementation approaches and a senior stakeholder deciding whether to fund an MDM program. One article, two very different reader needs."
+deliverable: "A long-form explainer covering the five core MDM data domains (customer, product, vendor, location, asset), three implementation areas (data cleansing, governance, system integration), six application areas, and a best-practices reference table with MDM implementation sequence and strategic outlook."
+outcome: "Published on the Alexander Thamm blog. [NEEDS: page views, engagement metrics if available]"
+tools: ["Grammarly", "Canva"]
+url: "https://www.alexanderthamm.com/en/blog/master-data-management/"
+featured: true
+order: 2
+---
+
+## The brief
+
+Master Data Management sits at the intersection of data governance, ERP integration, and enterprise architecture. Most introductory content either stays too abstract (useful for nobody) or goes deep into specific platform features (useful only for practitioners already sold on MDM).
+
+The brief called for something that could orient a reader who understands databases but has never run an MDM program, while staying specific enough that a data architect could use it as a reference.
+
+## What I wrote
+
+The article is organized around a clear taxonomy: what MDM is, what it covers (the five data domains), where it applies, and how to implement it well.
+
+The five-domain section is the technical core. Each domain — customer, product, vendor/supplier, location, and asset — gets its own treatment: what it contains, which systems depend on it, and what breaks when it's managed poorly. For product master data, that's SKU inconsistencies cascading into order processing failures. For vendor master data, it's duplicate payments and audit failures. These aren't hypotheticals; they're the actual failure modes that make MDM a funded program rather than a nice-to-have.
+
+The application section covers data cleansing, governance, system integration, regulatory compliance, analytics, and DataOps. The goal was to show MDM as an operational discipline that runs across all of these, not just a data cleanup project.
+
+The best-practices table closes the piece. Six practices, each with an explanation that names the failure it prevents rather than just describing the practice in the abstract.
+
+## Process
+
+Brief from the client's marketing team. Research was primarily primary (direct knowledge of ERP ecosystems and data governance frameworks from prior technical work). The article maps directly to how SAP, Salesforce, and cloud data platforms handle master data, which shaped both the examples and the terminology choices.
+
+Draft edited through Grammarly. Final layout in Canva per client design system.

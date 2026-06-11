@@ -1,0 +1,201 @@
+---
+import Page from '../../layouts/Page.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('work');
+  return entries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { title, summary, domain, role, year, client, problem, deliverable, outcome, tools, url } = entry.data;
+
+const domainLabel = { devtools: 'Dev Tools', ai: 'AI', security: 'Security' }[domain];
+---
+
+<Page title={title} description={summary}>
+
+  <article class="case-study">
+
+    <header class="case-header page-wrap">
+      <div class="case-meta-top">
+        <span class="domain-tag" data-domain={domain}>{domainLabel}</span>
+        <span class="mono-label year">{year}</span>
+      </div>
+      <h1 class="case-title">{title}</h1>
+      <p class="case-summary">{summary}</p>
+
+      <dl class="case-spec">
+        <div class="spec-row">
+          <dt class="mono-label">Client</dt>
+          <dd>{client ?? '[NEEDS: client]'}</dd>
+        </div>
+        <div class="spec-row">
+          <dt class="mono-label">Role</dt>
+          <dd>{role}</dd>
+        </div>
+        <div class="spec-row">
+          <dt class="mono-label">Year</dt>
+          <dd>{year}</dd>
+        </div>
+        <div class="spec-row">
+          <dt class="mono-label">Tools</dt>
+          <dd>{tools.join(', ')}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="case-brief page-wrap">
+      <div class="brief-grid">
+        <div class="brief-item">
+          <p class="mono-label brief-label">Problem</p>
+          <p class="brief-text">{problem}</p>
+        </div>
+        <div class="brief-item">
+          <p class="mono-label brief-label">Deliverable</p>
+          <p class="brief-text">{deliverable}</p>
+        </div>
+        <div class="brief-item brief-outcome">
+          <p class="mono-label brief-label">Outcome</p>
+          <p class="brief-text">{outcome}</p>
+          {url && (
+            <a href={url} target="_blank" rel="noopener noreferrer" class="case-link mono-label">
+              View published piece &rarr;
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div class="case-body page-wrap">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <nav class="case-nav page-wrap" aria-label="Case study navigation">
+      <a href="/work" class="mono-label back-link">&larr; All work</a>
+    </nav>
+
+  </article>
+
+</Page>
+
+<style>
+  .case-study {
+    padding-bottom: var(--gap-2xl);
+  }
+
+  .case-header {
+    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-bottom: var(--gap-xl);
+    max-width: 800px;
+  }
+
+  .case-meta-top {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    margin-bottom: var(--gap-md);
+  }
+
+  .year { color: var(--color-muted); }
+
+  .case-title {
+    font-size: clamp(var(--text-2xl), 3.5vw, var(--text-4xl));
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--gap-md);
+  }
+
+  .case-summary {
+    font-size: var(--text-xl);
+    color: var(--color-ink-2);
+    line-height: var(--leading-normal);
+    font-style: italic;
+    max-width: 640px;
+    margin-bottom: var(--gap-lg);
+  }
+
+  /* Spec block */
+  .case-spec {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--gap-md);
+    padding: var(--gap-md);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-rule);
+  }
+
+  .spec-row dt {
+    color: var(--color-muted);
+    margin-bottom: 0.35em;
+  }
+  .spec-row dd {
+    font-size: var(--text-sm);
+    color: var(--color-ink);
+    line-height: var(--leading-snug);
+  }
+
+  /* Brief grid */
+  .case-brief {
+    padding-block: var(--gap-xl);
+    border-top: 1px solid var(--color-rule);
+    max-width: 800px;
+  }
+
+  .brief-grid {
+    display: grid;
+    gap: var(--gap-lg);
+  }
+
+  .brief-label {
+    color: var(--color-muted);
+    margin-bottom: var(--gap-sm);
+  }
+
+  .brief-text {
+    color: var(--color-ink-2);
+    line-height: var(--leading-relaxed);
+  }
+
+  .case-link {
+    display: inline-block;
+    margin-top: var(--gap-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-accent);
+    padding-bottom: 2px;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .case-link:hover { opacity: 0.75; }
+
+  /* Body */
+  .case-body {
+    max-width: var(--prose-w);
+    padding-bottom: var(--gap-xl);
+  }
+
+  /* Nav */
+  .case-nav {
+    padding-top: var(--gap-lg);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .back-link {
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration) var(--ease);
+  }
+  .back-link:hover { color: var(--color-ink); }
+</style>

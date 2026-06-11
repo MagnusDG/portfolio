@@ -1,0 +1,328 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const all = await getCollection('photos');
+  const series = [...new Set(all.map(p => p.data.series).filter(Boolean))] as string[];
+  return series.map(s => ({ params: { series: s } }));
+}
+
+const { series } = Astro.params;
+const all = await getCollection('photos');
+const photos = all
+  .filter(p => p.data.series === series)
+  .sort((a, b) => {
+    const oA = a.data.order ?? 999;
+    const oB = b.data.order ?? 999;
+    if (oA !== oB) return oA - oB;
+    return b.data.date.valueOf() - a.data.date.valueOf();
+  });
+
+const total = photos.length;
+---
+
+<Base title={`${series} — Minh Tú`}>
+  <div class="viewer-shell">
+
+    <!-- Back + series name -->
+    <header class="viewer-header">
+      <a href="/#collections" class="back-btn" aria-label="Back to all collections">
+        <span class="back-arrow">&#8592;</span>
+        <span class="back-label">Collections</span>
+      </a>
+      <span class="series-name">{series}</span>
+      <span class="counter" id="counter" aria-live="polite" aria-atomic="true">
+        1 / {total}
+      </span>
+    </header>
+
+    <!-- Fullscreen slides -->
+    <main class="viewer-stage" id="viewer-stage">
+      {photos.map((photo, i) => (
+        <div
+          class="slide"
+          data-index={i}
+          aria-hidden={i !== 0 ? 'true' : 'false'}
+          role="img"
+          aria-label={photo.data.alt}
+        >
+          <img
+            class="slide-img"
+            src={photo.data.src}
+            alt={photo.data.alt}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+          <div class="slide-meta" aria-hidden="true">
+            {photo.data.caption && (
+              <p class="slide-caption">{photo.data.caption}</p>
+            )}
+            {photo.data.location && (
+              <p class="slide-location">{photo.data.location}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </main>
+
+    <!-- Navigation -->
+    <nav class="viewer-nav" aria-label="Photo navigation">
+      <button
+        class="nav-btn nav-prev"
+        id="nav-prev"
+        aria-label="Previous photo"
+        disabled
+      >
+        &#8592;
+      </button>
+
+      <!-- Thumbnail strip -->
+      <div class="thumb-strip" role="list" aria-label="Photo thumbnails">
+        {photos.map((photo, i) => (
+          <button
+            class="thumb"
+            data-thumb={i}
+            aria-label={`Go to photo ${i + 1}`}
+            role="listitem"
+          >
+            <img
+              src={photo.data.src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </button>
+        ))}
+      </div>
+
+      <button
+        class="nav-btn nav-next"
+        id="nav-next"
+        aria-label="Next photo"
+      >
+        &#8594;
+      </button>
+    </nav>
+
+  </div>
+</Base>
+
+<script>
+  const slides   = document.querySelectorAll<HTMLElement>('.slide');
+  const thumbs   = document.querySelectorAll<HTMLButtonElement>('.thumb');
+  const counter  = document.getElementById('counter')!;
+  const prevBtn  = document.getElementById('nav-prev') as HTMLButtonElement;
+  const nextBtn  = document.getElementById('nav-next') as HTMLButtonElement;
+  const total    = slides.length;
+  let current    = 0;
+
+  function goTo(n: number) {
+    if (n < 0 || n >= total) return;
+
+    slides[current].classList.remove('is-active');
+    slides[current].setAttribute('aria-hidden', 'true');
+    thumbs[current].classList.remove('is-active');
+
+    current = n;
+
+    slides[current].classList.add('is-active');
+    slides[current].setAttribute('aria-hidden', 'false');
+    thumbs[current].classList.add('is-active');
+
+    counter.textContent = `${current + 1} / ${total}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+
+    // Keep active thumb in view
+    thumbs[current].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+
+  // Init
+  slides[0].classList.add('is-active');
+  thumbs[0].classList.add('is-active');
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  thumbs.forEach((t, i) => t.addEventListener('click', () => goTo(i)));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  // Swipe support (touch)
+  let touchStartX = 0;
+  const stage = document.getElementById('viewer-stage')!;
+  stage.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+</script>
+
+<style>
+  .viewer-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--void);
+  }
+
+  /* ─── HEADER ─── */
+  .viewer-header {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+    padding: 0 var(--pad-page);
+    height: 48px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: var(--muted);
+    transition: color var(--duration) ease;
+  }
+  .back-btn:hover { color: var(--ink-2); }
+  .back-arrow { font-size: 1em; }
+  .back-label { display: none; }
+
+  @media (min-width: 480px) {
+    .back-label { display: inline; }
+  }
+
+  .series-name {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    color: var(--ink-2);
+    text-transform: lowercase;
+  }
+
+  .counter {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── STAGE ─── */
+  .viewer-stage {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 350ms ease;
+  }
+  .slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .slide-meta {
+    position: absolute;
+    bottom: var(--gap-md);
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .slide-caption {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: rgba(176, 173, 168, 0.7);
+  }
+
+  .slide-location {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    color: rgba(112, 108, 103, 0.7);
+    margin-top: 0.2em;
+    text-transform: lowercase;
+  }
+
+  /* ─── NAV ─── */
+  .viewer-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    padding: var(--gap-sm) var(--pad-page);
+    flex-shrink: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: var(--text-lg);
+    padding: 0.4em 0.6em;
+    border-radius: 2px;
+    transition: color var(--duration) ease;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .nav-btn:hover:not(:disabled) { color: var(--ink); }
+  .nav-btn:disabled { opacity: 0.2; cursor: default; }
+  .nav-btn:focus-visible { outline: 1px solid var(--ink-2); }
+
+  /* Thumbnail strip */
+  .thumb-strip {
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 2px 0;
+  }
+  .thumb-strip::-webkit-scrollbar { display: none; }
+
+  .thumb {
+    flex-shrink: 0;
+    width: 56px;
+    height: 40px;
+    border: none;
+    padding: 0;
+    overflow: hidden;
+    background: var(--void-3);
+    opacity: 0.35;
+    transition: opacity var(--duration) ease;
+    border-radius: 1px;
+  }
+  .thumb:hover      { opacity: 0.65; }
+  .thumb.is-active  { opacity: 1; outline: 1px solid var(--ink-2); }
+  .thumb:focus-visible { outline: 1px solid var(--ink); outline-offset: 1px; }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>

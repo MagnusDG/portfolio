@@ -1,0 +1,122 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  category?: string;
+  lang?: string;
+  tags?: string[];
+}
+
+const { title, description, pubDate, updatedDate, category, lang = 'en', tags = [] } = Astro.props;
+
+const pubDateStr = pubDate.toLocaleDateString('en-CA');
+const updDateStr = updatedDate?.toLocaleDateString('en-CA');
+---
+
+<Base title={title} description={description}>
+  <Nav />
+  <main id="main-content" class="post-main">
+    <article class="post-wrap">
+
+      <header class="post-header page-wrap">
+        <div class="post-meta">
+          <time class="mono-label" datetime={pubDate.toISOString()}>{pubDateStr}</time>
+          {category && <span class="mono-label">{category}</span>}
+          {lang === 'vi' && <span class="mono-label lang-badge">VI</span>}
+        </div>
+        <h1 class="post-title">{title}</h1>
+        <p class="post-desc">{description}</p>
+        {updatedDate && (
+          <p class="post-updated mono-label">Updated {updDateStr}</p>
+        )}
+        {tags.length > 0 && (
+          <ul class="post-tags" role="list">
+            {tags.map(t => <li class="mono-label">{t}</li>)}
+          </ul>
+        )}
+      </header>
+
+      <div class="post-body page-wrap">
+        <div class="prose">
+          <slot />
+        </div>
+      </div>
+
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .post-main {
+    padding-bottom: var(--gap-2xl);
+  }
+
+  .post-header {
+    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-bottom: var(--gap-xl);
+    max-width: var(--prose-w);
+    border-bottom: 1px solid var(--color-rule);
+    margin-bottom: var(--gap-xl);
+  }
+
+  .post-meta {
+    display: flex;
+    gap: var(--gap-sm);
+    align-items: center;
+    margin-bottom: var(--gap-md);
+    color: var(--color-muted);
+  }
+
+  .lang-badge {
+    background: var(--color-muted);
+    color: var(--color-paper);
+    padding: 0.1em 0.4em;
+    border-radius: var(--radius-sm);
+  }
+
+  .post-title {
+    font-size: clamp(var(--text-2xl), 3.5vw, var(--text-4xl));
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--gap-md);
+  }
+
+  .post-desc {
+    font-size: var(--text-xl);
+    color: var(--color-ink-2);
+    line-height: var(--leading-normal);
+    font-style: italic;
+  }
+
+  .post-updated {
+    margin-top: var(--gap-sm);
+    color: var(--color-muted);
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-sm);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--gap-md);
+  }
+  .post-tags li {
+    padding: 0.2em 0.6em;
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    color: var(--color-muted);
+  }
+
+  .post-body {
+    max-width: var(--prose-w);
+  }
+</style>

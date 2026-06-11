@@ -1,0 +1,36 @@
+---
+title: "Responsible AI: From Principles to Operating Model"
+summary: "A framework explainer written for risk officers and CDOs who need specific, enforceable practices — not another definition of AI ethics."
+domain: "security"
+role: "Technical writer, ghostwriter"
+year: 2026
+client: "Alexander Thamm GmbH"
+problem: "Responsible AI had become a compliance buzzword. The client's audience — CDOs, CISOs, and risk officers evaluating AI governance — had read enough vague principles documents. They needed something specific enough to act on: a framework with named roles, documented artifacts, and a clear distinction between what responsible AI is and what it operationally requires."
+deliverable: "A framework explainer covering six responsible AI cornerstones (fairness, transparency, explainability, privacy/security, safety/robustness, accountability), an eight-step implementation sequence with primary owners and key artifacts, EU AI Act penalty structure, and the critical distinction between AI ethics (philosophy) and responsible AI (engineering and governance)."
+outcome: "[NEEDS: publication date and URL when live]"
+tools: ["Grammarly", "Canva", "EU AI Act documentation", "ISO/IEC 42001:2023"]
+featured: true
+order: 3
+---
+
+## The brief
+
+Responsible AI content tends to cluster in two failure modes: either it's a values statement with no operational guidance, or it's a checklist of technical controls with no explanation of why they matter. The client's audience — primarily CDOs and CISOs at organizations scaling AI in regulated industries — needed neither.
+
+The brief was to write something that could answer: "What do we actually need to build?" A senior risk officer should be able to hand this to their team and say "here's the framework."
+
+## What I wrote
+
+The article opens by drawing a sharp distinction between AI ethics (the philosophical question of what AI should do) and responsible AI (the engineering and governance work that makes ethical principles enforceable). That distinction matters because organizations often treat the two as equivalent, which produces elegant principles documents and no operational controls.
+
+The six cornerstones section covers fairness, transparency, explainability, privacy and security, safety and robustness, and accountability. Each one is explained in terms of what breaks when you skip it — a hiring model trained on historical decisions amplifying past biases through feedback loops, a fraud detection system attacked via prompt injection, a clinical AI that nobody acts on because it can't be explained to the clinician who received the alert.
+
+The security section required specific care. AI systems introduce attack surfaces traditional security models weren't designed for: membership inference attacks, model inversion, prompt injection, and unintended data leakage through retrieval pipelines. These aren't theoretical — they're the threat categories that change how data governance has to be structured for AI workloads specifically.
+
+The eight-step implementation sequence is the practical core. Each step identifies a primary owner (CDO, CAIO, MLOps team, internal audit) and a key artifact (model cards, bias reports, rollback playbooks, audit calendars). The goal was a framework someone could actually implement, not describe.
+
+EU AI Act penalty structure is cited with specific numbers: EUR 35 million or 7% of global turnover for the most serious violations, EUR 15 million or 3% for high-risk system violations. Giving the actual ceiling matters because it changes how risk conversations happen at the executive level.
+
+## Process
+
+Brief from the client's marketing team. Research covered IBM, AWS, and Google's responsible AI frameworks, ISO/IEC 42001:2023, and the EU AI Act directly (Article 99 on penalties). Prior work in security research and disinformation analysis informed the sections on adversarial robustness and the gap between theoretical governance and what actually holds under operational pressure.

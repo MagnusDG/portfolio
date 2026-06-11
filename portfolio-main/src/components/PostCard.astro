@@ -1,0 +1,71 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  category: 'essay' | 'technical' | 'note';
+  lang: 'en' | 'vi';
+  slug: string;
+}
+
+const { title, description, pubDate, category, lang, slug } = Astro.props;
+
+const dateStr = pubDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
+const categoryLabel = { essay: 'Essay', technical: 'Technical', note: 'Note' }[category];
+---
+
+<article class="post-card">
+  <header class="post-card-meta">
+    <span class="mono-label post-date">{dateStr}</span>
+    <span class="mono-label post-cat">{categoryLabel}</span>
+    {lang === 'vi' && <span class="mono-label post-lang">VI</span>}
+  </header>
+  <h3 class="post-card-title">
+    <a href={`/writing/${slug}`}>{title}</a>
+  </h3>
+  <p class="post-card-desc">{description}</p>
+</article>
+
+<style>
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    padding-block: var(--gap-md);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .post-card:first-child { border-top: 1px solid var(--color-rule); }
+
+  .post-card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+  }
+
+  .post-date { color: var(--color-muted); }
+  .post-cat { color: var(--color-muted); }
+  .post-lang {
+    color: var(--color-paper);
+    background: var(--color-muted);
+    padding: 0.1em 0.4em;
+    border-radius: var(--radius-sm);
+  }
+
+  .post-card-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight);
+  }
+  .post-card-title a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .post-card-title a:hover { color: var(--color-accent); }
+
+  .post-card-desc {
+    color: var(--color-ink-2);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
+</style>

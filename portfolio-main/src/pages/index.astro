@@ -1,0 +1,250 @@
+---
+import Page from '../layouts/Page.astro';
+import WorkCard from '../components/WorkCard.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const allWork = await getCollection('work', ({ data }) => data.featured);
+const sortedWork = allWork.sort((a, b) => a.data.order - b.data.order);
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft && data.lang === 'en');
+const recentPosts = allPosts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const domains = [
+  { label: 'API Documentation', desc: 'Reference docs, getting-started guides, and migration paths for developer-facing APIs.' },
+  { label: 'AI Product Writing', desc: 'Technical explainers, model cards, and governance documentation for AI systems.' },
+  { label: 'Security & Compliance', desc: 'Threat modeling docs, EU AI Act frameworks, and compliance-oriented content for regulated industries.' },
+  { label: 'Developer Experience', desc: 'Onboarding, tutorials, and conceptual guides that reduce integration friction.' },
+];
+---
+
+<Page title="Minh Tú Nguyễn" description="Technical writer for dev tools, AI, and security products.">
+
+  <!-- Hero -->
+  <section class="hero page-wrap">
+    <div class="hero-content">
+      <p class="hero-label mono-label">Technical Writer</p>
+      <h1 class="hero-heading">
+        I write for engineers, architects, and the people who deploy what they build.
+      </h1>
+      <p class="hero-sub">
+        The work covers dev tools, AI systems, and security products — documentation, technical explainers, and the kind of content that has to hold up when a reader checks the claims. Background in computer science and security research.
+      </p>
+      <div class="hero-ctas">
+        <a href="/work" class="cta-primary">See the work</a>
+        <a href="/contact" class="cta-secondary">Get in touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Domain strip -->
+  <section class="domains" aria-label="Areas of focus">
+    <div class="page-wrap">
+      <p class="section-label mono-label">01 — Areas of focus</p>
+      <ul class="domain-grid" role="list">
+        {domains.map(d => (
+          <li class="domain-item">
+            <strong class="domain-name">{d.label}</strong>
+            <p class="domain-desc">{d.desc}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Featured work -->
+  <section class="section-work" aria-labelledby="work-heading">
+    <div class="page-wrap">
+      <header class="section-header">
+        <p class="section-label mono-label">02 — Work</p>
+        <h2 id="work-heading" class="section-heading">Selected case studies</h2>
+      </header>
+      <div class="work-grid">
+        {sortedWork.map(entry => (
+          <WorkCard
+            title={entry.data.title}
+            summary={entry.data.summary}
+            domain={entry.data.domain}
+            role={entry.data.role}
+            year={entry.data.year}
+            client={entry.data.client}
+            slug={entry.slug}
+          />
+        ))}
+      </div>
+      <a href="/work" class="section-more mono-label">All case studies</a>
+    </div>
+  </section>
+
+  <!-- Recent writing -->
+  <section class="section-writing" aria-labelledby="writing-heading">
+    <div class="page-wrap">
+      <header class="section-header">
+        <p class="section-label mono-label">03 — Writing</p>
+        <h2 id="writing-heading" class="section-heading">Recent posts</h2>
+      </header>
+      <div class="posts-list">
+        {recentPosts.map(entry => (
+          <PostCard
+            title={entry.data.title}
+            description={entry.data.description}
+            pubDate={entry.data.pubDate}
+            category={entry.data.category}
+            lang={entry.data.lang}
+            slug={entry.slug}
+          />
+        ))}
+      </div>
+      <a href="/writing" class="section-more mono-label">All posts</a>
+    </div>
+  </section>
+
+</Page>
+
+<style>
+  /* Hero */
+  .hero {
+    padding-top: clamp(4rem, 10vw, 8rem);
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .hero-content {
+    max-width: 760px;
+  }
+
+  .hero-label {
+    margin-bottom: var(--gap-md);
+  }
+
+  .hero-heading {
+    font-size: clamp(var(--text-3xl), 4.5vw, var(--text-5xl));
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-ink);
+    margin-bottom: var(--gap-md);
+  }
+
+  .hero-sub {
+    font-size: var(--text-lg);
+    color: var(--color-ink-2);
+    line-height: var(--leading-normal);
+    max-width: 600px;
+    margin-bottom: var(--gap-lg);
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: var(--gap-md);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .cta-primary {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    padding: 0.65em 1.4em;
+    background: var(--color-accent);
+    color: var(--color-paper);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-accent);
+    transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  }
+  .cta-primary:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: var(--color-paper);
+  }
+
+  .cta-secondary {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    padding: 0.65em 1.4em;
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    transition: border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+  }
+  .cta-secondary:hover {
+    border-color: var(--color-ink-2);
+    color: var(--color-ink);
+  }
+
+  /* Domain strip */
+  .domains {
+    padding-block: var(--gap-xl);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--gap-lg);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--gap-lg);
+  }
+
+  .domain-name {
+    display: block;
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: var(--gap-xs);
+    color: var(--color-ink);
+  }
+
+  .domain-desc {
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+    line-height: var(--leading-normal);
+  }
+
+  /* Shared section styles */
+  .section-work,
+  .section-writing {
+    padding-block: var(--gap-xl);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .section-header {
+    margin-bottom: var(--gap-lg);
+  }
+
+  .section-label {
+    margin-bottom: var(--gap-sm);
+  }
+
+  .section-heading {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--gap-md);
+  }
+
+  .posts-list {
+    max-width: 720px;
+  }
+
+  .section-more {
+    display: inline-block;
+    margin-top: var(--gap-lg);
+    color: var(--color-accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-accent);
+    padding-bottom: 2px;
+    transition: opacity var(--duration) var(--ease);
+  }
+  .section-more:hover { opacity: 0.75; }
+</style>

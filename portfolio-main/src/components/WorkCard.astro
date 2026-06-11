@@ -1,0 +1,93 @@
+---
+interface Props {
+  title: string;
+  summary: string;
+  domain: 'devtools' | 'ai' | 'security';
+  role: string;
+  year: number;
+  client?: string;
+  slug: string;
+}
+
+const { title, summary, domain, role, year, client, slug } = Astro.props;
+
+const domainLabel = { devtools: 'Dev Tools', ai: 'AI', security: 'Security' }[domain];
+---
+
+<article class="work-card">
+  <header class="work-card-meta">
+    <span class="domain-tag" data-domain={domain}>{domainLabel}</span>
+    <span class="mono-label">{year}</span>
+  </header>
+  <h3 class="work-card-title">
+    <a href={`/work/${slug}`}>{title}</a>
+  </h3>
+  <p class="work-card-summary">{summary}</p>
+  <footer class="work-card-footer">
+    {client && <span class="work-card-client mono-label">{client}</span>}
+    <a href={`/work/${slug}`} class="work-card-link">Read the case study</a>
+  </footer>
+</article>
+
+<style>
+  .work-card {
+    padding: var(--gap-lg);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    background: var(--color-paper);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+    transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+  }
+  .work-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-accent) 8%, transparent);
+  }
+
+  .work-card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+  }
+
+  .work-card-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight);
+    margin-top: var(--gap-xs);
+  }
+  .work-card-title a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .work-card-title a:hover { color: var(--color-accent); }
+
+  .work-card-summary {
+    color: var(--color-ink-2);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    flex: 1;
+  }
+
+  .work-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    margin-top: var(--gap-xs);
+    padding-top: var(--gap-sm);
+    border-top: 1px solid var(--color-rule);
+    flex-wrap: wrap;
+  }
+
+  .work-card-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    color: var(--color-accent);
+  }
+  .work-card-link:hover { color: var(--color-accent-hover); }
+</style>

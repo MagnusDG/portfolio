@@ -1,0 +1,68 @@
+/* Design tokens — portfolio-main */
+
+:root {
+  /* Color */
+  --color-ink:         #1C2333;
+  --color-ink-2:       #3D4760;
+  --color-muted:       #6B778F;
+  --color-paper:       #F8F9FC;
+  --color-surface:     #EEF1F7;
+  --color-rule:        #E0E4EE;
+  --color-accent:      #2B5CE6;
+  --color-accent-hover:#1E46C7;
+  --color-accent-dim:  #EBF0FD;
+
+  /* Domain tag colors */
+  --color-ai:         #2B5CE6;
+  --color-devtools:   #1A7F5A;
+  --color-security:   #7C3AED;
+
+  /* Typography */
+  --font-body: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+
+  --text-xs:   0.6875rem;  /* 11px */
+  --text-sm:   0.8125rem;  /* 13px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.5rem;     /* 40px */
+  --text-5xl:  3.25rem;    /* 52px */
+
+  --leading-tight:   1.15;
+  --leading-snug:    1.35;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:  0.06em;
+  --tracking-wider: 0.1em;
+
+  /* Layout */
+  --max-w:     1100px;
+  --prose-w:   72ch;
+  --nav-h:     56px;
+  --pad-page:  clamp(1.25rem, 5vw, 2.5rem);
+  --gap-xs:    0.5rem;
+  --gap-sm:    0.875rem;
+  --gap-md:    1.5rem;
+  --gap-lg:    3rem;
+  --gap-xl:    5rem;
+  --gap-2xl:   8rem;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius:    4px;
+  --radius-md: 6px;
+
+  /* Transitions */
+  --ease:      cubic-bezier(0.16, 1, 0.3, 1);
+  --duration:  180ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Reserved for future dark mode pass */
+}

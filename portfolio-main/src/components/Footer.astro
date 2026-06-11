@@ -1,0 +1,50 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="page-wrap footer-inner">
+    <p class="footer-copy mono-label">
+      &copy; {year} Minh Tú Nguyễn
+    </p>
+    <nav aria-label="Footer navigation">
+      <ul class="footer-links" role="list">
+        <li><a href="https://www.linkedin.com/in/[NEEDS:linkedin-handle]" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="mailto:[NEEDS:email]">Email</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--gap-2xl);
+    padding-block: var(--gap-lg);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    flex-wrap: wrap;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--gap-md);
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-links a {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration) var(--ease);
+  }
+  .footer-links a:hover { color: var(--color-ink); }
+</style>

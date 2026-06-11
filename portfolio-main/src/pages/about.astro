@@ -1,0 +1,108 @@
+---
+import Page from '../layouts/Page.astro';
+---
+
+<Page
+  title="About"
+  description="Background, domains, and why I write."
+>
+  <div class="page-wrap about-page">
+
+    <header class="page-header">
+      <p class="section-label mono-label">About</p>
+      <h1 class="page-heading">Minh Tú Nguyễn</h1>
+    </header>
+
+    <div class="about-body prose">
+
+      <p>
+        I started in computer science and ended up in communication, which is less of a pivot than it sounds. Both are about taking something complex and making it possible to reason about. The difference is the output format.
+      </p>
+
+      <p>
+        The academic background is in machine learning and security. I spent time on threat intelligence and disinformation research before moving into technical writing. That path matters for the work: I read a technical spec with a different kind of attention than someone who learned writing first. I notice the assumptions embedded in the second paragraph, the edge cases the author left implicit, the thing that will trip up a developer integrating this at midnight.
+      </p>
+
+      <h2>What I write</h2>
+
+      <p>
+        The main territory is documentation, explainers, and long-form technical content for three kinds of products: developer tools and APIs, AI and ML systems, and security products. These aren't three separate specialties. They're one territory — technical and security-minded products — approached from different angles.
+      </p>
+
+      <p>
+        I've also written content that needs to work for a non-technical audience: business cases, thought leadership pieces, compliance-oriented explainers. When the goal is to move someone from "I don't understand this" to "I understand this well enough to make a decision," the skill is the same. The register changes; the underlying work doesn't.
+      </p>
+
+      <h2>How I work</h2>
+
+      <p>
+        I take a brief, research into it (primary sources, not just summaries of summaries), bring in direct experience where it's relevant, and write something that holds up when a knowledgeable reader checks it. I use Grammarly for mechanical editing. I work in Markdown. I can work in any publishing system that outputs to the web.
+      </p>
+
+      <p>
+        I prefer to understand the reader before I write the first sentence. That's not a soft preference — it's the part of the process where most documentation fails.
+      </p>
+
+      <h2>Outside the work</h2>
+
+      <p>
+        I take photographs. Not as a profession, as a way of seeing. If that's what you're here for:
+        <a href="[NEEDS: photos subdomain URL]" target="_blank" rel="noopener noreferrer">photos.your-domain.com</a>
+      </p>
+
+    </div>
+
+    <div class="about-cta">
+      <a href="/contact" class="cta-primary">Work together</a>
+    </div>
+
+  </div>
+</Page>
+
+<style>
+  .about-page {
+    padding-top: clamp(3rem, 7vw, 5rem);
+    padding-bottom: var(--gap-2xl);
+  }
+
+  .page-header {
+    margin-bottom: var(--gap-xl);
+  }
+
+  .section-label { margin-bottom: var(--gap-sm); }
+
+  .page-heading {
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+  }
+
+  .about-body {
+    margin-bottom: var(--gap-xl);
+  }
+
+  .about-cta {
+    padding-top: var(--gap-lg);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .cta-primary {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    padding: 0.65em 1.4em;
+    background: var(--color-accent);
+    color: var(--color-paper);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-accent);
+    transition: background var(--duration) var(--ease);
+  }
+  .cta-primary:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: var(--color-paper);
+  }
+</style>

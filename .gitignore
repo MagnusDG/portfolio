@@ -16,3 +16,9 @@ Thumbs.db
 
 # Logs
 npm-debug.log*
+
+# Client work samples — keep private, not for public repo
+samples/
+
+# Unused asset folder (images live in public/photos/)
+portfolio-photos/src/assets/
